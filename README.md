@@ -3,7 +3,7 @@ An algorithm about detecting  ICS honeypot
 
 The dataset(data_no_ip.csv) contains three common ICS honeypots, Modbus, ATG, and S7.
 
-The processed data is located in the 'data' folder, containing data for three different protocols. It can be directly used for running the proposal_algorithm_1.py script
+The processed data is located in the 'data' folder, containing data for three different protocols. It can be directly used for running the proposal_algorithm_1.py script.(These files can be obtained by running process_*.py）
 
 This program needs to be run in a Python3 or higher environment, and requires the libraries numpy and pandas.
 
@@ -25,4 +25,4 @@ example:
     you can load other protocol ICS honeypot data
     
 process_*.py :
-After running the file, you will get two files: numpy_array_data_s7 and numpy_label_data_s7. Put these two files into the data folder and then you can run proposal_algorithm_1.py.
+After running the file, you will get two files: numpy_array_data_* and numpy_label_data_*. Put these two files into the data folder and then you can run proposal_algorithm_1.py. (I have put all the processed files into the "data" file)
