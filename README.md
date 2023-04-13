@@ -23,6 +23,7 @@ example:
     label_data = np.loadtxt("data/numpy_label_data_xx")
     """
     you can load other protocol ICS honeypot data
-    
+
+-------------------------------
 process_*.py :
 After running the file, you will get two files: numpy_array_data_* and numpy_label_data_*. Put these two files into the data folder and then you can run proposal_algorithm_1.py. (I have put all the processed files into the "data" file)
