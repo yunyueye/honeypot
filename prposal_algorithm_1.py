@@ -127,20 +127,25 @@ if __name__ == "__main__":
         print(m)
     
     # Process test dataset
-    test_output = [[] for i in range(len(selected_feature_index))]
-    for i in range(len(selected_feature_index)):
-        optimal_i = selected_feature_index[0:i+1]
-        feature_data = test_feature_array[:, optimal_i]
-        feature_size = feature_data.shape
-        for sample_i in range(feature_size[0]):
-            f_sample = list(feature_data[sample_i])        
-            for f_i in range(len(poster_p_list[i])):       
-                if f_sample == poster_p_list[i][f_i][0]:
-                    f_p_0 = poster_p_list[i][f_i][1][0]    
-                    f_p_1 = poster_p_list[i][f_i][1][1]    
+    test_output = [[] for i in range(len(selected_feature_index))] 
+    for i in range(len(selected_feature_index)):   # Iterating over the optimal feature list
+        optimal_i = selected_feature_index[0:i+1]  # Combining the first i features: (f1, f2, ..,fi)
+        feature_data = test_feature_array[:, optimal_i]  # Fetching data for the corresponding feature
+        feature_size = feature_data.shape          
+        for sample_i in range(feature_size[0]):    # index of sample; Calculating the probability for the i-th sample  
+            f_sample = list(feature_data[sample_i])   # Feature data for the i-th sample      
+            for f_i in range(len(poster_p_list[i])):  # Looking up the table in the calculated posterior probability table
+                if f_sample == poster_p_list[i][f_i][0]: # Finding the posterior probability for the current feature combination
+                    f_p_0 = poster_p_list[i][f_i][1][0]  # p(y=0|(f1, f2, ..,fi))  
+                    f_p_1 = poster_p_list[i][f_i][1][1]  # p(y=1|(f1, f2, ..,fi))  
                     break
+            # Using Bayes' formula to calculate the probability of p(y=1) for the sample
             sample_p_1 = prior_p_1 * f_p_1 / (prior_p_1 * f_p_1 + prior_p_0 * f_p_0)                           
-            test_output[i].append(sample_p_1)
+            test_output[i].append(sample_p_1)  # Saving the results
+            """test_outout: The i-th sublist of the result represents the probability 
+            of each sample being a honeypot in the i-th calculation; 
+            The i-th calculation of probability uses the first i features (f1, f2, ..,fi)"""
+            
 
     test_output_array = np.array(test_output).T   
     test_output_array[test_output_array >= 0.6] = 1

@@ -5,6 +5,8 @@ Created on Sun May 22 22:13:20 2022
 @author: Admin
 """
 
+"For testing environment"
+
 import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
@@ -47,10 +49,10 @@ if __name__ == "__main__":
     
     feature_index = list(reversed(s.tolist()))
     
-    prior_p_0, prior_p_1, poster_p_list = algorithm_packet.computer_probability(
-                                train_label_array,
-                                selected_feature_index,
-                                train_feature_array)
+    # prior_p_0, prior_p_1, poster_p_list = algorithm_packet.computer_probability(
+    #                             train_label_array,
+    #                             selected_feature_index,
+    #                             train_feature_array)
     
     
     
