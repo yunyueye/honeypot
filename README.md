@@ -24,3 +24,5 @@ example:
     """
     you can load other protocol ICS honeypot data
     
+process_*.py :
+After running the file, you will get two files: numpy_array_data_s7 and numpy_label_data_s7. Put these two files into the data folder and then you can run proposal_algorithm_1.py.
