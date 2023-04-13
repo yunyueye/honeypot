@@ -13,6 +13,15 @@ import copy
 import algorithm_packet
 from sklearn.tree import DecisionTreeClassifier
 
+"""Notation List
+h_d: H(S)      entropy of dataset S;                       formula 8 in paper
+h_d_a: H(S|F)  entropy of dataset S;                       formula 8 in paper
+g_d_a: g(F,S)  information gain of feature F to dataset S; formula 8 in paper
+selected_feature_index == used_index:  optimal order of features T_M = F-M = {f_i1, f_i2,..., f_iM} formula 12
+prior_p_0, prior_p_1: prior probability {P_lamda(y)}  model parameter formula 14
+poster_p_list: probability P(Xm|y={0,1})  model parameter   formula 13
+sample_p_1：  posterior probability p(y=1|f_i)  formula 1
+"""
 
    
     
@@ -50,7 +59,7 @@ if __name__ == "__main__":
     # the number of train samples
     d_ = train_feature_array.shape[0]
 
-    # Select the first feature
+    # Select the first feature  62-90 <-> formulas 11 and 12 in paper 
     g_d_a = []
     for f in range(feature_number):
         used_index = [f]
@@ -61,7 +70,7 @@ if __name__ == "__main__":
         h_d_a = algorithm_packet.compute_condition_entropy(feature_count_list, d_)
         g_d_a.append(h_d - h_d_a)
 
-    selected_feature_index = [g_d_a.index(max(g_d_a))]   # 此处序号即为特征索引
+    selected_feature_index = [g_d_a.index(max(g_d_a))]   # The index here refers to the feature index
     
     used_index = copy.deepcopy(selected_feature_index)
     # Calculate the other features g_d_a
@@ -69,7 +78,7 @@ if __name__ == "__main__":
         unused_feature = list(set(all_feature_index) - set(selected_feature_index))
         g_d_a = []
         for f_index in unused_feature:
-            used_index.append(f_index)   # 增加新的特征 
+            used_index.append(f_index)   
             feature_count_list = algorithm_packet.compute_sample_number(
                 train_feature_array, 
                 train_label_array, 
@@ -80,8 +89,8 @@ if __name__ == "__main__":
         selected_feature_index.append(unused_feature[g_d_a.index(max(g_d_a))])
         used_index = copy.deepcopy(selected_feature_index)
     
-    # Where "selected_feature_index" is a list of feature importance sorted in descending order.
-
+    # Where "selected_feature_index" and "used_index" are two list of feature importance sorted in descending order.
+    """  "selected_feature_index" and "used_index" == F_M  """
     
     # Calculate Laplace prior probability and Bayesian Laplace conditional probability
     prior_p_0, prior_p_1, poster_p_list = algorithm_packet.computer_probability(
@@ -89,9 +98,17 @@ if __name__ == "__main__":
                                 selected_feature_index,
                                 # attention_index,
                                 train_feature_array)
+    """prior_p_0, prior_p_1: prior probability {P_lamda(y)}  model parameter formula 14
+       poster_p_list:  probability P(Xm|y={0,1})  model parameter   formula 13
+    """
     
+    """ selected_feature_index, prior_p_0, prior_p_1, poster_p_list are algorithm1 ouput"""
     
     """   Evaluate the performance on the training set  """
+    """  algorithm 2 The principle is to use the lookup table method to find the 
+    conditional probability corresponding to the sample features, 
+    and then use the Bayes formula to calculate the posterior probability of the sample. """
+    
     train_output = [[] for i in range(len(selected_feature_index))]
     for i in range(len(selected_feature_index)):
         optimal_i = selected_feature_index[0:i+1]          # Select the index of the i-th feature
@@ -100,13 +117,15 @@ if __name__ == "__main__":
         for sample_i in range(feature_size[0]):
             f_sample = list(feature_data[sample_i])        
             for f_i in range(len(poster_p_list[i])):       
-                if f_sample == poster_p_list[i][f_i][0]:
-                    f_p_0 = poster_p_list[i][f_i][1][0]    # Probability of belonging to class 0
-                    f_p_1 = poster_p_list[i][f_i][1][1]    # Probability of belonging to class 1
+                if f_sample == poster_p_list[i][f_i][0]: # lookup table
+                    f_p_0 = poster_p_list[i][f_i][1][0]  #  Probability p(f_i|y=0)
+                    f_p_1 = poster_p_list[i][f_i][1][1]  #  Probability p(f_i|y=1)
                     break
+            # formula 1 in paper; posterior probability p(y=1|f_i)
             sample_p_1 = prior_p_1 * f_p_1 / (prior_p_1 * f_p_1 + prior_p_0 * f_p_0)                           
             train_output[i].append(sample_p_1)
     
+    # determine if it is greater than the threshold
     train_output_array = np.array(train_output).T   
     train_output_array[train_output_array >= 0.5] = 1
     train_output_array[train_output_array < 0.5] = 0
@@ -136,7 +155,7 @@ if __name__ == "__main__":
             f_sample = list(feature_data[sample_i])   # Feature data for the i-th sample      
             for f_i in range(len(poster_p_list[i])):  # Looking up the table in the calculated posterior probability table
                 if f_sample == poster_p_list[i][f_i][0]: # Finding the posterior probability for the current feature combination
-                    f_p_0 = poster_p_list[i][f_i][1][0]  # p(y=0|(f1, f2, ..,fi))  
+                    f_p_0 = poster_p_list[i][f_i][1][0]  # posterior Probability p(f_i|y=0)  
                     f_p_1 = poster_p_list[i][f_i][1][1]  # p(y=1|(f1, f2, ..,fi))  
                     break
             # Using Bayes' formula to calculate the probability of p(y=1) for the sample
